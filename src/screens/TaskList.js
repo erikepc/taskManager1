@@ -15,7 +15,7 @@ export default function TaskList() {
             id: Math.random(),
             desc: 'Elaborar o MER do TCC',
             estimateAt: new Date(),
-            doneAt: new Date()                   
+            doneAt: null                  
         },
         {
             id: Math.random(),
@@ -27,7 +27,7 @@ export default function TaskList() {
             id: Math.random(),
             desc: 'Desenvolver o Backend do sistema',
             estimateAt: new Date(),
-            doneAt: new Date()                   
+            doneAt: null                   
         },
         {
             id: Math.random(),
@@ -39,7 +39,7 @@ export default function TaskList() {
             id: Math.random(),
             desc: 'Desenvolver o Backend do sistema',
             estimateAt: new Date(),
-            doneAt: new Date()                   
+            doneAt: null                   
         },
         {
             id: Math.random(),
@@ -89,6 +89,18 @@ export default function TaskList() {
     const today = moment().tz("America/Sao_Paulo").locale('pt-br').format('ddd, D [de] MMMM')
     //const today = moment().locale('pt-br').format('ddd, D [de] MMMM')
 
+    toggleTask = taskId => {
+        const taskList = [...tasks]
+        TaskList.forEach(task => {
+            if(task.id === taskId) {
+                task.doneAt = task.doneAt ? null : new Date()
+            }
+        });
+
+        tasks = taskList
+    }
+
+    
     return(
         <View style={styles.container}> 
 
