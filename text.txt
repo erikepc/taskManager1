@@ -1,2 +1,4 @@
 git config --global user.name erikepc
 git config --global user.email erike45@hotmail.com
+
+alinhar codigo automatico = ALT + SHIFT + F  OU CTRL + SHIFT + K 
