@@ -1,20 +1,23 @@
-import { useEffect, useState } from "react";
-import { Text, View, StyleSheet, ImageBackground, TouchableOpacity, FlatList } from "react-native";
+import { useEffect, useState } from "react"
+import { Text, View, StyleSheet, ImageBackground, TouchableOpacity, FlatList } from "react-native"
 
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "react-native-vector-icons/FontAwesome"
 
-import moment from "moment-timezone";
-import 'moment/locale/pt-br';
+import moment from "moment-timezone"
+import 'moment/locale/pt-br'
 
 import todayImage from '../../assets/imgs/today.jpg'
-import Task from "../../components/task";
+
+import Task from '../../components/Task'
+
+import AddTask from "./AddTask"
 
 const taskDB = [
     {
         id: Math.random(),
         desc: 'Elaborar o MER do TCC',
         estimateAt: new Date(),
-        doneAt: null
+        doneAt: new Date()
     },
     {
         id: Math.random(),
@@ -35,10 +38,11 @@ export default function TaskList() {
     const [tasks, setTasks] = useState([...taskDB])
     const [showDoneTasks, setShowDoneTasks] = useState(true)
     const [visibleTasks, setVisibleTasks] = useState([...tasks])
-
-    const userTimeZone = moment.tz.guess(); //detecta fuso horario do dispositivo
-    const today = moment().tz("America/Sao_Paulo").locale('pt-br').format('ddd, D [de] MMMM')
+    const [showAddTask, setShowAddTask] = useState(false)
     
+    const userTimeZone = moment.tz.guess(); // Detecta o fuso horario do dispositivo
+    const today = moment().tz('America/Sao_Paulo').locale('pt-br').format('ddd, D [de] MMMM')
+
     useEffect(() => {
         filterTasks()
     }, [showDoneTasks])
@@ -66,7 +70,7 @@ export default function TaskList() {
             visibleTasks = [...tasks]
 
         } else {
-            const pending = tasks => tasks.doneAt === null
+            const pending = task => task.doneAt === null
             visibleTasks = tasks.filter(pending)
         }
 
@@ -75,6 +79,9 @@ export default function TaskList() {
 
     return (
         <View style={styles.container}>
+
+            <AddTask isVisible={showAddTask} 
+                onCancel={() => setShowAddTask(false)}/>
 
             <ImageBackground source={todayImage} style={styles.background}>
                 <View style={styles.iconBar}>
@@ -93,12 +100,17 @@ export default function TaskList() {
                 <FlatList
                     data={visibleTasks}
                     keyExtractor={item => `${item.id}`}
-                    renderItem={({ item }) => <Task {...item} onToggleTask={toggleTask}/>}
+                    renderItem={({ item }) => <Task {...item} onToggleTask={toggleTask} />}
                 />
             </View>
 
-            <TouchableOpacity style={styles.addButton} activeOpacity={0.7} onPress={() => console.warn('+')}>
-                <Icon name="plus" size={40} color={'#fff'} />
+            <TouchableOpacity
+                style={styles.addButton}
+                activeOpacity={0.7}
+                onPress={() => setShowAddTask(true)}
+            >
+                <Icon name="plus" size={20} color={'#fff'} />
+
             </TouchableOpacity>
 
         </View>
@@ -107,19 +119,17 @@ export default function TaskList() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-
+        flex: 1
     },
     background: {
-        flex: 3,
-
+        flex: 3
     },
     taskList: {
-        flex: 7,
+        flex: 7
     },
     titleBar: {
         flex: 1,
-        justifyContent: 'flex-end',
+        justifyContent: 'flex-end'
     },
     title: {
         color: 'white',
@@ -137,13 +147,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginHorizontal: 20,
         justifyContent: 'flex-end',
-        marginTop: 20
+        marginTop: 25
     },
     addButton: {
         position: 'absolute',
         right: 30,
         bottom: 30,
-        width: 40,
+        width: 50,
+        height: 50,
         borderRadius: 25,
         backgroundColor: '#B13B44',
         justifyContent: 'center',
