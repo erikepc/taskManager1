@@ -8,7 +8,7 @@ import 'moment/locale/pt-br'
 
 import todayImage from '../../assets/imgs/today.jpg'
 
-import Task from '../../components/Task'
+import Task from '../../components/task'
 
 import AddTask from "./AddTask"
 

@@ -1,18 +1,52 @@
 import { useState } from "react";
-import { Modal, StyleSheet, TouchableWithoutFeedback, View, Text, TextInput, TouchableOpacity } from "react-native";
+import { Modal, StyleSheet, TouchableWithoutFeedback, View, Text, TextInput, TouchableOpacity, Plataform } from "react-native";
 import commomStyles from "./commomStyles";
 
-export default function AddTask(props){
+import moment from "moment";
 
-    const [desc,setDesc] = useState("")
+import DateTimePicker from "@react-native-community/datetimepicker";
 
-    return(
-        <Modal transparent={true} 
-            visible={props.isVisible} 
+
+export default function AddTask(props) {
+
+    const [desc, setDesc] = useState("")
+    const [date, setDate] = useState(new Date())
+    const [showDatePicker, setShowDatePicker] = useState(new Date())
+
+    const getDatePicker = () => {
+        let datePicker = 
+        <DateTimePicker value={date} 
+            onChange = {(_, date) => {
+                    setDate(date)
+                    setShowDatePicker(false)
+                }}
+                mode='date'
+            />
+
+        const dateString = moment(date).format('ddd, D [de] MMMM [de] YYYY')
+
+        if(Plataform.OS === 'android'){
+            datePicker = (
+                <View>
+                    <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                        <Text style={styles.date}>
+                            {dateString}
+                        </Text>
+                    </TouchableOpacity>
+                    {showDatePicker && datePicker}
+                </View>
+            )
+        }
+        return datePicker
+    }
+
+    return (
+        <Modal transparent={true}
+            visible={props.isVisible}
             onRequestClose={props.onCancel}
             animationType="slide">
 
-            <TouchableWithoutFeedback 
+            <TouchableWithoutFeedback
                 onPress={props.onCancel}>
                 <View style={styles.background}></View>
             </TouchableWithoutFeedback>
@@ -23,7 +57,10 @@ export default function AddTask(props){
                     style={styles.input}
                     placeholder="Informe a Descrição"
                     onChangeText={setDesc}
-                    value={desc}/>
+                    value={desc} />
+
+                {this.getDatePicker()} 
+                
                 <View style={styles.buttons}>
                     <TouchableOpacity onPress={props.onCancel}>
                         <Text style={styles.button}>Cancelar</Text>
@@ -36,9 +73,9 @@ export default function AddTask(props){
                 </View>
             </View>
 
-            <TouchableWithoutFeedback 
+            <TouchableWithoutFeedback
                 onPress={props.onCancel}>
-                    
+
                 <View style={styles.background}></View>
             </TouchableWithoutFeedback>
         </Modal>
@@ -53,7 +90,7 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#fff',
         flex: 1
-    }, 
+    },
     header: {
         backgroundColor: commomStyles.colors.today,
         color: commomStyles.colors.secondary,
