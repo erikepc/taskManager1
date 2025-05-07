@@ -2,7 +2,7 @@ import { View, Text, TouchableWithoutFeedback, StyleSheet } from "react-native"
 import moment from 'moment-timezone'
 import 'moment/locale/pt-br'
 
-import commomStyles from "../src/screens/commomStyles"
+import commomStyles from "../commomStyles"
 import Icon from "react-native-vector-icons/FontAwesome";
 
 export default props => {
