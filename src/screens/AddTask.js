@@ -59,7 +59,7 @@ export default function AddTask(props) {
                             <DateTimePicker
                                 value={date}
                                 mode="date"
-                                display="default"
+                                display="spinner"
                                 onChange={handleDateChange}
                             />
                         )}
