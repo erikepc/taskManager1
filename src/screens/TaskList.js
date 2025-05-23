@@ -11,6 +11,7 @@ import todayImage from '../../assets/imgs/today.jpg'
 import Task from '../components/task'
 
 import AddTask from "./AddTask"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 const taskDB = [
     {
@@ -35,7 +36,7 @@ const taskDB = [
 
 export default function TaskList() {
 
-    const [tasks, setTasks] = useState([...taskDB])
+    const [tasks, setTasks] = useState([])
     const [showDoneTasks, setShowDoneTasks] = useState(true)
     const [visibleTasks, setVisibleTasks] = useState([...tasks])
     const [showAddTask, setShowAddTask] = useState(false)
@@ -43,9 +44,26 @@ export default function TaskList() {
     const userTimeZone = moment.tz.guess(); // Detecta o fuso horario do dispositivo
     const today = moment().tz('America/Sao_Paulo').locale('pt-br').format('ddd, D [de] MMMM')
 
+    const [contador, setContador] = useState(0)
+
+    useEffect(() => {
+        setContador(contador + 1)
+        if(contador == 0){
+            getTasks()
+        }
+
+        filterTasks()
+    }, [showDoneTasks])
+
     useEffect(() => {
         filterTasks()
-    }, [showDoneTasks, tasks])
+    }, [tasks])
+
+    async function getTasks() {
+        const tasksString = await AsyncStorage.getItem('tasksState')
+        const tasks = tasksString && JSON.parse(tasksString) || taskDB
+        setTasks(tasks)
+    }
 
     const toggleTask = taskId => {
         const taskList = [...tasks]
@@ -91,12 +109,15 @@ export default function TaskList() {
         })
         setTasks(tempTasks)
         setShowAddTask(false)
+
+        AsyncStorage.setItem('tasksState', JSON.stringify(tempTasks))
     }
 
     const deleteTask = id => {
         const tempTasks = tasks.filter(task => task.id !== id)
+       setTasks(tempTasks)
 
-        setTasks(tempTasks)
+       AsyncStorage.setItem('tasksState', JSON.stringify(tempTasks))
     }
 
     return (
