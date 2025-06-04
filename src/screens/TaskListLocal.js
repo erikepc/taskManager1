@@ -12,7 +12,6 @@ import Task from '../components/task'
 
 import AddTask from "./AddTask"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import axios from "axios"
 
 const taskDB = [
     {
@@ -35,7 +34,7 @@ const taskDB = [
     }
 ]
 
-export default function TaskList() {
+export default function TaskListLocal() {
 
     const [tasks, setTasks] = useState([])
     const [showDoneTasks, setShowDoneTasks] = useState(true)
@@ -61,12 +60,9 @@ export default function TaskList() {
     }, [tasks])
 
     async function getTasks() {
-        try {
-            const response = await axios.get('https://683f935d5b39a8039a54fc7c.mockapi.io/tasks')
-            setTasks(response.data)
-        } catch (error) {
-            console.error('Erro ao carregar os dados', error)
-        }
+        const tasksString = await AsyncStorage.getItem('tasksState')
+        const tasks = tasksString && JSON.parse(tasksString) || taskDB
+        setTasks(tasks)
     }
 
     const toggleTask = taskId => {
