@@ -41,7 +41,7 @@ export default function TaskList() {
     const [showDoneTasks, setShowDoneTasks] = useState(true)
     const [visibleTasks, setVisibleTasks] = useState([...tasks])
     const [showAddTask, setShowAddTask] = useState(false)
-    
+
     const userTimeZone = moment.tz.guess(); // Detecta o fuso horario do dispositivo
     const today = moment().tz('America/Sao_Paulo').locale('pt-br').format('ddd, D [de] MMMM')
 
@@ -49,7 +49,7 @@ export default function TaskList() {
 
     useEffect(() => {
         setContador(contador + 1)
-        if(contador == 0){
+        if (contador == 0) {
             getTasks()
         }
 
@@ -69,15 +69,27 @@ export default function TaskList() {
         }
     }
 
-    const toggleTask = taskId => {
+    const toggleTask = async taskId => {
         const taskList = [...tasks]
+
+        let taskUpdate = null
+
         taskList.forEach(task => {
             if (task.id === taskId) {
                 task.doneAt = task.doneAt ? null : new Date()
+                taskUpdate = task
             }
         });
 
         setTasks(taskList)
+
+        try {
+            const response = await axios.put(`https://683f935d5b39a8039a54fc7c.mockapi.io/tasks/${taskUpdate.id}`, taskUpdate)
+        } catch (error) {
+            console.error('Erro ao atualizar tarefa', error)
+        }
+
+
         filterTasks()
     }
 
@@ -88,7 +100,7 @@ export default function TaskList() {
     const filterTasks = () => {
         let visibleTasks = null
 
-        if(showDoneTasks){
+        if (showDoneTasks) {
             visibleTasks = [...tasks]
 
         } else {
@@ -99,38 +111,59 @@ export default function TaskList() {
         setVisibleTasks(visibleTasks)
     }
 
-    const addTask = newTask => {
-        if(!newTask.desc || !newTask.desc.trim()){
+    const addTask = async newTask => {
+        if (!newTask.desc || !newTask.desc.trim()) {
             Alert.alert('Dados Inválidos', 'Descrição não informada!')
         }
 
         const tempTasks = [...tasks]
-        tempTasks.push({
-            id: Math.random(),
+
+        const taskAdd = {
+            id: getLastTaskId(),
             desc: newTask.desc,
             estimateAt: newTask.date,
             doneAt: null
-        })
+        }
+
+        tempTasks.push(taskAdd)
+
         setTasks(tempTasks)
         setShowAddTask(false)
+
+        try {
+            const response = await axios.post('https://683f935d5b39a8039a54fc7c.mockapi.io/tasks', taskAdd)
+        } catch (error) {
+            console.error('Error ao adicionar Tarefa', error)
+        }
 
         AsyncStorage.setItem('tasksState', JSON.stringify(tempTasks))
     }
 
-    const deleteTask = id => {
-        const tempTasks = tasks.filter(task => task.id !== id)
-       setTasks(tempTasks)
+    const deleteTask = async id => {
+        //     const tempTasks = tasks.filter(task => task.id !== id)
+        //     setTasks(tempTasks)
+        //     AsyncStorage.setItem('tasksState', JSON.stringify(tempTasks))
 
-       AsyncStorage.setItem('tasksState', JSON.stringify(tempTasks))
+        try {
+            const response = await axios.delete(`https://683f935d5b39a8039a54fc7c.mockapi.io/tasks/${id}`)
+        } catch (error) {
+            console.error('Erro ao excluir a tarefa', error)
+        }
+
+        getTasks()
+    }
+
+    function getLastTaskId(){
+        return Math.max(...tasks.map(task => task.id)) + 1
     }
 
     return (
         <View style={styles.container}>
 
-            <AddTask isVisible={showAddTask} 
+            <AddTask isVisible={showAddTask}
                 onCancel={() => setShowAddTask(false)}
                 onSave={addTask}
-                />
+            />
 
             <ImageBackground source={todayImage} style={styles.background}>
                 <View style={styles.iconBar}>
@@ -149,9 +182,9 @@ export default function TaskList() {
                 <FlatList
                     data={visibleTasks}
                     keyExtractor={item => `${item.id}`}
-                    renderItem={({ item }) => 
-                        <Task {...item} onToggleTask={toggleTask} onDelete={deleteTask}  />
-                }
+                    renderItem={({ item }) =>
+                        <Task {...item} onToggleTask={toggleTask} onDelete={deleteTask} />
+                    }
                 />
             </View>
 
